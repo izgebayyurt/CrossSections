@@ -11,16 +11,19 @@ public class SlideObject : MonoBehaviour
     private float _startingZ;
     
     // Define a scale
-    [Range(-10, 10)]
-    public float positionRange;
+    public float positionMin;
+    public float positionMax;
+    private float _position;
+    private float _normalizedPosition;
 
     public List<GameObject> objectsToSlide;
     private int objectIdx;
 
     private void Start()
     {
-        _startingY = transform.position.y;
-        _startingZ = transform.position.z;
+        _startingY = transform.localPosition.y;
+        _startingZ = transform.localPosition.z;
+        _position = transform.localPosition.x;
         objectIdx = 0;
         foreach (GameObject obj in objectsToSlide)
         {
@@ -32,8 +35,7 @@ public class SlideObject : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (positionRange < -10) positionRange = -10;
-        if (positionRange > 10) positionRange = 10;
+        UpdateButtonPosition();   
 
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
@@ -57,11 +59,19 @@ public class SlideObject : MonoBehaviour
     
     void LateUpdate()
     {
-        Vector3 newPos = new Vector3(positionRange, _startingY, _startingZ);
-        transform.position = newPos;
+        Vector3 newPos = new Vector3(_position, _startingY, _startingZ);
+        transform.localPosition = newPos;
         foreach (GameObject obj in objectsToSlide)
         {
             obj.transform.position = newPos + Vector3.forward * -5;
         }
+    }
+
+    void UpdateButtonPosition()
+    {
+        _position = transform.localPosition.x;
+        _normalizedPosition = _position / positionMax;
+        if (_position < positionMin) _position = positionMin;
+        if (_position > positionMax) _position = positionMax;
     }
 }
